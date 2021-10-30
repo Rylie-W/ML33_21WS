@@ -100,7 +100,7 @@ def get_neighbors_labels(X_train, y_train, X_new, k):
     for d in distance_matrix:
         # https://stackoverflow.com/questions/34226400/find-the-index-of-the-k-smallest-values-of-a-numpy-array
         k_nearest_idex=np.argpartition(d,k)
-        labels=[y_train[i] for i in k_nearest_idex]
+        labels=[y_train[i] for i in k_nearest_idex[:k]]
         neighbors_labels.append(labels)
 
     return np.array(neighbors_labels)
@@ -123,7 +123,6 @@ def get_response(neighbors_labels, num_classes=3):
     """
     # TODO
     y=[]
-    # class_votes = np.zeros(num_classes)
     for labels in neighbors_labels:
         unique, counts=np.unique(labels,return_counts=True)
         y.append(unique[np.argmax(counts)])
@@ -144,7 +143,7 @@ def compute_accuracy(y_pred, y_test):
     for i in range(len(y_pred)):
         if y_pred[i]!=y_test[i]:
             false_counter+=1
-    return false_counter/len(y_pred)
+    return 1-false_counter/len(y_pred)
 
 
 # This function is given, nothing to do here.
