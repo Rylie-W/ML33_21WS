@@ -1,6 +1,5 @@
-import sklearn.datasets as datasets
 import matplotlib.pyplot as plt
-from sklearn import model_selection
+from sklearn import model_selection, datasets
 import numpy as np
 
 
@@ -25,28 +24,37 @@ def load_dataset(split):
     """
     dataset = datasets.load_iris()
     X, y = dataset['data'], dataset['target']
-    X_train, X_test, y_train, y_test = model_selection.train_test_split(X, y, random_state=123, test_size=(1 - split))
+    X_train, X_test, y_train, y_test = model_selection.train_test_split(
+        X, y, random_state=123, test_size=(1 - split))
     return X_train, X_test, y_train, y_test
+
+
 def prepare_data():
     # prepare data
     split = 0.75
     X_train, X_test, y_train, y_test = load_dataset(split)
     return X_train, y_train
 
+
 def plot_data(X_train, y_train):
     f, axes = plt.subplots(4, 4, figsize=(15, 15))
     for i in range(4):
         for j in range(4):
             if j == 0 and i == 0:
-                axes[i, j].text(0.5, 0.5, 'Sepal. length', ha='center', va='center', size=24, alpha=.5)
+                axes[i, j].text(0.5, 0.5, 'Sepal. length',
+                                ha='center', va='center', size=24, alpha=.5)
             elif j == 1 and i == 1:
-                axes[i, j].text(0.5, 0.5, 'Sepal. width', ha='center', va='center', size=24, alpha=.5)
+                axes[i, j].text(0.5, 0.5, 'Sepal. width',
+                                ha='center', va='center', size=24, alpha=.5)
             elif j == 2 and i == 2:
-                axes[i, j].text(0.5, 0.5, 'Petal. length', ha='center', va='center', size=24, alpha=.5)
+                axes[i, j].text(0.5, 0.5, 'Petal. length',
+                                ha='center', va='center', size=24, alpha=.5)
             elif j == 3 and i == 3:
-                axes[i, j].text(0.5, 0.5, 'Petal. width', ha='center', va='center', size=24, alpha=.5)
+                axes[i, j].text(0.5, 0.5, 'Petal. width',
+                                ha='center', va='center', size=24, alpha=.5)
             else:
-                axes[i, j].scatter(X_train[:, j], X_train[:, i], c=y_train, cmap=plt.cm.cool)
+                axes[i, j].scatter(X_train[:, j], X_train[:, i],
+                                   c=y_train, cmap=plt.cm.cool)
     plt.show()
 
 
@@ -66,13 +74,12 @@ def euclidean_distance(x1, x2):
         Pairwise Euclidean distances between x1 and x2.
     """
     # https://www.dabblingbadger.com/blog/2020/2/27/implementing-euclidean-distance-matrix-calculations-from-scratch-in-python]
-    M=x1.shape[0]
-    N=x2.shape[0]
+    M = x1.shape[0]
+    N = x2.shape[0]
 
-    x1_dots=(x1*x1).sum(axis=1).reshape(M,1)*np.ones(shape=(1,N))
-    # x2_dots=(x2*x2).sum(axis=1)*np.ones(shape=(M*1))
+    x1_dots = (x1 * x1).sum(axis=1).reshape(M, 1) * np.ones(shape=(1, N))
     x2_dots = (x2 * x2).sum(axis=1)
-    return x1_dots+x2_dots-2*x1.dot(x2.T)
+    return x1_dots + x2_dots - 2 * x1.dot(x2.T)
 
 
 def get_neighbors_labels(X_train, y_train, X_new, k):
@@ -94,13 +101,13 @@ def get_neighbors_labels(X_train, y_train, X_new, k):
     neighbors_labels : array, shape (M, k)
         Array containing the labels of the k nearest neighbors.
     """
-    neighbors_labels=[]
+    neighbors_labels = []
 
     distance_matrix = euclidean_distance(X_new, X_train)
     for d in distance_matrix:
         # https://stackoverflow.com/questions/34226400/find-the-index-of-the-k-smallest-values-of-a-numpy-array
-        k_nearest_idex=np.argpartition(d,k)
-        labels=[y_train[i] for i in k_nearest_idex[:k]]
+        k_nearest_idex = np.argpartition(d, k)
+        labels = [y_train[i] for i in k_nearest_idex[:k]]
         neighbors_labels.append(labels)
 
     return np.array(neighbors_labels)
@@ -121,10 +128,9 @@ def get_response(neighbors_labels, num_classes=3):
     y : int array, shape (M,)
         Majority class among the neighbors.
     """
-    # TODO
-    y=[]
+    y = []
     for labels in neighbors_labels:
-        unique, counts=np.unique(labels,return_counts=True)
+        unique, counts = np.unique(labels, return_counts=True)
         y.append(unique[np.argmax(counts)])
     return np.array(y)
 
@@ -139,11 +145,11 @@ def compute_accuracy(y_pred, y_test):
     y_test : array, shape (N_test)
         True labels.
     """
-    false_counter=0
+    true_counter = 0
     for i in range(len(y_pred)):
-        if y_pred[i]!=y_test[i]:
-            false_counter+=1
-    return 1-false_counter/len(y_pred)
+        if y_pred[i] == y_test[i]:
+            true_counter+=1
+    return true_counter / len(y_pred)
 
 
 # This function is given, nothing to do here.
@@ -169,6 +175,8 @@ def predict(X_train, y_train, X_test, k):
     neighbors = get_neighbors_labels(X_train, y_train, X_test, k)
     y_pred = get_response(neighbors)
     return y_pred
+
+
 if __name__ == '__main__':
     # X_train, y_train=prepare_data()
     # plot_data(X_train, y_train)

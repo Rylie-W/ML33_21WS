@@ -4,7 +4,7 @@
 
 ## Installation
 
-`git clone` 
+`git clone https://github.com/Rylie-W/ML33_21WS.git` 
 
 ## Usage
 
