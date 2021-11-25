@@ -101,7 +101,7 @@ def compute_log_posterior(theta, samples, a, b):
     for i, t in enumerate(theta):
         res[i][0] = loggamma(tail + a + head + b) - loggamma(tail + a) - loggamma(
             head + b) + (tail + a - 1) * log(t) + (head + b - 1) * log(1 - t)
-    return np.array(res)
+    return res
 
 
 def compute_theta_mle(samples):
